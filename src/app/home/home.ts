@@ -6,6 +6,7 @@ import { ProductComponent } from '../product/product-component/product-component
 import { CommonModule } from '@angular/common';
 import { CartService } from '../cart/cart-service';
 import { WatchlistService } from '../watchlist/watchlist-service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +31,12 @@ import { WatchlistService } from '../watchlist/watchlist-service';
 })
 export class Home {
   productService = inject(ProductService);
-  productList: Product[] = this.productService.getAllProducts();
+  productList: Product[] = [];
+  ngOnInit() {
+    this.productService.getAllProducts().subscribe(products => {
+      this.productList = products;
+    });
+  }
 
   cartService = inject(CartService);
   watchlistService = inject(WatchlistService);

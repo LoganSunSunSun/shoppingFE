@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../product/product';
 
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private cartItems: Product[] = [];

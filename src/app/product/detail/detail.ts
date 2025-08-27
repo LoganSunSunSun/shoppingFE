@@ -11,8 +11,8 @@ import { Header } from '../../header/header';
   template: `
     <app-header />
   <h3>{{ product?.name }}</h3>
-      <p>Quantity: {{ product?.quantity }}</p>
-      <p>Price: {{ product?.price }}</p>
+      <p>Description: {{ product?.description }}</p>
+      <p>Price: {{ product?.retailPrice }}</p>
   `,
   styles: ``
 })
@@ -20,9 +20,14 @@ export class Detail {
   route: ActivatedRoute = inject(ActivatedRoute);
   productService: ProductService = inject(ProductService);
   product: Product | undefined;
+  ngOnInit() {
+  const productId = 1; // or get from route params
+  this.productService.getProductById(productId).subscribe(p => {
+    this.product = p;
+  });
+}
   constructor(){
     const productId = parseInt(this.route.snapshot.params['id'], 10);
-    this.product = this.productService.getProductById(productId);
   }
 
 }

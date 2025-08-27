@@ -10,8 +10,7 @@ import { Header } from '../../header/header';
   template: `
     <div class="product-card">
       <h3>{{ product.name }}</h3>
-      <p>Quantity: {{ product.quantity }}</p>
-      <p>Price: {{ product.price }}</p>
+      <p>Price: {{ product.retailPrice }}</p>
       <a [routerLink]="['/product-details', product.id]">Learn More</a>
     </div>
   `,
