@@ -1,13 +1,20 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Header } from './header/header';
+import { Home } from './home/home';
+import { Authenticate } from './authenticate/authenticate';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `
-    <h1>Welcome to {{ title() }}!</h1>
+  imports: [RouterOutlet, Authenticate],
+  template: 
+  `
 
-    <router-outlet />
+    <section class="content">
+      <router-outlet />
+    </section>
+    
   `,
   styles: [],
 })
