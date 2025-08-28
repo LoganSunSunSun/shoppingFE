@@ -1,14 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Header } from '../../../header/header';
 import { AdminHeader } from '../../admin-header/admin-header';
+import { AdminOrderService } from '../admin-order-service';
+import { Order } from '../../../order/order-service';
 
-interface Order {
-  id: number;
-  date: string;
-  total: number;
-}
+
 
 @Component({
   selector: 'app-admin-order-component',
@@ -22,37 +20,68 @@ interface Order {
         <tr>
           <th>Order ID</th>
           <th>Date</th>
-          <th>Total</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let order of orders">
           <td>{{ order.id }}</td>
-          <td>{{ order.date }}</td>
-          <td>{{ order.total }}</td>
+          <td>{{ order.placedAt }}</td>
+          <td>{{ order.status }}</td>
           <td>
             <a [routerLink]="['/admin/orders', order.id]">Details</a>
-            <button (click)="cancelOrder(order.id)">Cancel</button>
+            <button *ngIf="order.status === 'PROCESSING'" (click)="cancelOrder(order.id)">Cancel</button>
+            <button *ngIf="order.status === 'PROCESSING'" (click)="completeOrder(order.id)">Complete</button>
           </td>
         </tr>
       </tbody>
     </table>
   `
 })
-export class AdminOrderComponent {
-  orders: Order[] = [
-    { id: 1, date: '2025-08-26', total: 120.5 },
-    { id: 2, date: '2025-08-25', total: 45.0 },
-    { id: 3, date: '2025-08-24', total: 78.9 },
-  ];
-  cancelOrder(orderId: number) {
-    if (confirm(`Cancel order #${orderId}?`)) {
-      // For now, just remove from the list
-      this.orders = this.orders.filter(o => o.id !== orderId);
-      // Later: call backend API to cancel order
-      console.log(`Order ${orderId} canceled`);
-    }
+
+export class AdminOrderComponent implements OnInit {
+  orders: Order[] = [];
+
+  constructor(private orderService: AdminOrderService) {}
+
+  ngOnInit(): void {
+    this.loadOrders();
   }
 
+  loadOrders(): void {
+    this.orderService.getAllOrders().subscribe({
+      next: (res) => this.orders = res,
+      error: (err) => console.error('Failed to load orders', err)
+    });
+  }
+
+  cancelOrder(orderId: number): void {
+    if (!confirm(`Cancel order #${orderId}?`)) return;
+
+    this.orderService.cancelOrder(orderId).subscribe({
+      next: () => {
+        this.orders = this.orders.filter(o => o.id !== orderId);
+        console.log(`Order ${orderId} canceled`);
+      },
+      error: (err) => console.error('Failed to cancel order', err)
+    });
+  }
+
+  completeOrder(orderId: number): void {
+    if (!confirm(`Mark order #${orderId} as complete?`)) return;
+
+    this.orderService.completeOrder(orderId).subscribe({
+      next: () => {
+        // Optionally update the local list: remove or mark as complete
+        const index = this.orders.findIndex(o => o.id === orderId);
+        if (index !== -1) {
+          // For example, remove from list:
+          this.orders.splice(index, 1);
+        }
+        console.log(`Order ${orderId} completed`);
+      },
+      error: (err) => console.error('Failed to complete order', err)
+    });
+  }
 }

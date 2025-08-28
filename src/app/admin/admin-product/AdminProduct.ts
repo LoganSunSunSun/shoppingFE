@@ -1,7 +1,8 @@
 export interface AdminProduct {
   id: number;
   name: string;
+  description: string;
   quantity: number;
-  price: number;
-  buyPrice: number;
+  retailPrice: number;
+  wholesalePrice: number;
 }

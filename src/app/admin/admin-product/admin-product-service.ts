@@ -1,43 +1,42 @@
 import { Injectable } from '@angular/core';
 import { AdminProduct } from './AdminProduct';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminProductService {
-  protected productList: AdminProduct[] = [
-  {
-    "id": 1,
-    "name": "Laptop",
-    "quantity": 10,
-    "price": 999.99,
-    "buyPrice": 111.00
-  },
-  {
-    "id": 2,
-    "name": "Smartphone",
-    "quantity": 0,
-    "price": 499.5,
-    "buyPrice": 111.00
-  },
-  {
-    "id": 3,
-    "name": "Headphones",
-    "quantity": 100,
-    "price": 0,
-    "buyPrice": 111.00
-  }
-]
-  getAllProducts(): AdminProduct[] {
-    return this.productList;
+  private apiUrl: string = 'http://localhost:8080/api/admin/products';
+
+  constructor(private http: HttpClient) {}
+
+  private getAuthHeader() {
+    const token = localStorage.getItem('token');
+    return { headers: { Authorization: `Bearer ${token}` } };
   }
 
-  getProductById(id: number) : AdminProduct | undefined {
-    return this.productList.find(product => product.id === id);
+  // Get all products
+  getAllProducts(): Observable<AdminProduct[]> {
+    return this.http.get<AdminProduct[]>(this.apiUrl, this.getAuthHeader());
   }
 
-  addProduct(product: AdminProduct) {
-    this.productList.push(product);
+  // Get product by ID
+  getProductById(id: number): Observable<AdminProduct> {
+    return this.http.get<AdminProduct>(`${this.apiUrl}/${id}`, this.getAuthHeader());
+  }
+
+  // Add a new product
+  addProduct(product: AdminProduct): Observable<AdminProduct> {
+    return this.http.post<AdminProduct>(this.apiUrl, product, this.getAuthHeader());
   }
   
+  // Update an existing product
+  updateProduct(product: AdminProduct): Observable<AdminProduct> {
+    return this.http.patch<AdminProduct>(
+    `${this.apiUrl}/${product.id}`,
+    product,
+    this.getAuthHeader()
+  );
+}
 }

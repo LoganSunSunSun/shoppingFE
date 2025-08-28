@@ -21,18 +21,23 @@ import { AdminProductService } from '../admin-product-service';
         </label>
 
         <label>
+          Description:
+          <input formControlName="description" />
+        </label>
+
+        <label>
           Quantity:
           <input type="number" formControlName="quantity" />
         </label>
 
         <label>
-          Price:
-          <input type="number" formControlName="price" />
+          Retail price:
+          <input type="number" formControlName="retailPrice" />
         </label>
 
         <label>
-          Buy Price:
-          <input type="number" formControlName="buyPrice" />
+          Wholesale price:
+          <input type="number" formControlName="wholesalePrice" />
         </label>
 
         <button type="submit" [disabled]="form.invalid">Save Changes</button>
@@ -94,35 +99,47 @@ export class AdminProductEdit implements OnInit {
     // read product id from route param
     this.productId = Number(this.route.snapshot.paramMap.get('id'));
 
-    // fetch product from service
-    this.product = this.productService.getProductById(this.productId);
+    // fetch product from service (Observable)
+    this.productService.getProductById(this.productId).subscribe({
+      next: (res) => {
+        this.product = res;
 
-    if (this.product) {
-      this.form = this.fb.group({
-        name: [this.product.name, Validators.required],
-        quantity: [this.product.quantity, [Validators.required, Validators.min(0)]],
-        price: [this.product.price, [Validators.required, Validators.min(0)]],
-        buyPrice: [this.product.buyPrice, [Validators.required, Validators.min(0)]],
-      });
-    }
+        // initialize form once product is fetched
+        this.form = this.fb.group({
+          name: [this.product.name, Validators.required],
+          description: [this.product.description, Validators.required, ],
+          quantity: [this.product.quantity, [Validators.required, Validators.min(0)]],
+
+          retailPrice: [this.product.retailPrice, [Validators.required, Validators.min(0)]],
+          wholesalePrice: [this.product.wholesalePrice, [Validators.required, Validators.min(0)]],
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load product', err);
+      },
+    });
   }
 
-  onSubmit(): void {
-    if (this.form.valid && this.product) {
-      const updatedProduct: AdminProduct = {
-        id: this.productId,
-        ...this.form.value
-      };
+onSubmit(): void {
+  if (this.form.valid && this.product) {
+    const updatedProduct: AdminProduct = {
+      id: this.productId,
+      ...this.form.value
+    };
 
-      // Simple in-memory update
-      Object.assign(this.product, updatedProduct);
-
-      console.log('Updated product:', this.product);
-
-      // Navigate back to product list
-      this.router.navigate(['/admin/dashboard']);
-      
-      alert('Product updated!');
-    }
+    this.productService.updateProduct(updatedProduct).subscribe({
+      next: (res) => {
+        console.log('Product updated successfully', res);
+        alert('Product updated successfully!');
+        // Navigate back to product list
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: (err) => {
+        console.error('Failed to update product', err);
+        alert('Failed to update product!');
+      }
+    });
   }
+}
+
 }

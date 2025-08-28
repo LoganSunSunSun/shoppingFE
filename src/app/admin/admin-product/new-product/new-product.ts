@@ -19,18 +19,23 @@ import { CommonModule } from '@angular/common';
         </label>
 
         <label>
+          Description:
+          <input formControlName="description" />
+        </label>
+
+        <label>
           Quantity:
           <input type="number" formControlName="quantity" />
         </label>
 
         <label>
-          Price:
-          <input type="number" formControlName="price" />
+          Retail Price:
+          <input type="number" formControlName="retailPrice" />
         </label>
 
         <label>
-          Buy Price:
-          <input type="number" formControlName="buyPrice" />
+          Wholesale Price:
+          <input type="number" formControlName="wholesalePrice" />
         </label>
 
         <button type="submit" [disabled]="form.invalid">Add Product</button>
@@ -74,6 +79,8 @@ import { CommonModule } from '@angular/common';
 })
 export class NewProduct {
   form: FormGroup;
+  productId!: number;
+  product?: AdminProduct;
 
   constructor(
     private fb: FormBuilder,
@@ -82,24 +89,30 @@ export class NewProduct {
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
+      description: ['', Validators.required],
       quantity: [0, [Validators.required, Validators.min(0)]],
-      price: [0, [Validators.required, Validators.min(0)]],
-      buyPrice: [0, [Validators.required, Validators.min(0)]],
+      retailPrice: [0, [Validators.required, Validators.min(0)]],
+      wholesalePrice: [0, [Validators.required, Validators.min(0)]],
     });
   }
 
-  onSubmit(): void {
-    if (this.form.valid) {
-      const newProduct: AdminProduct = {
-        id: this.productService.getAllProducts().length + 1, // simple id generation
-        ...this.form.value
-      };
+onSubmit(): void {
+  if (this.form.valid) {
+    const newProduct: AdminProduct = {
+      ...this.form.value
+    };
 
-      this.productService.addProduct(newProduct);
-      console.log('Added product:', newProduct);
-
-      // Navigate back to product list
-      this.router.navigate(['/admin/dashboard']);
-    }
+    this.productService.addProduct(newProduct).subscribe({
+      next: (res) => {
+        console.log('Product added:', res);
+        alert('Product added!');
+        this.router.navigate(['/admin/dashboard']);
+      },
+      error: (err) => {
+        console.error('Failed to add product', err);
+        alert('Failed to add product!');
+      }
+    });
   }
+}
 }

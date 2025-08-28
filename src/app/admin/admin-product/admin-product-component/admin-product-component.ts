@@ -9,12 +9,13 @@ import { RouterLink } from '@angular/router';
     <div class="product-card">
       <h3>{{ product.name }}</h3>
       <p>Quantity: {{ product.quantity }}</p>
-      <p>RetailPrice: {{ product.price }}</p>
-      <p>BuyPrice: {{ product.buyPrice }} </p>
+      <p>RetailPrice: {{ product.retailPrice }}</p>
+      <p>WholesalePrice: {{ product.wholesalePrice }} </p>
       <!-- Edit button -->
       <button [routerLink]="['/admin/product/edit', product.id]">
         Edit
       </button>
+      <a [routerLink]="['/admin-product-details', product.id]">Details</a>
     </div>
   `,
   styles: [`

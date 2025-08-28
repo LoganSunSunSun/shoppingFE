@@ -28,7 +28,23 @@ import { RouterLink } from '@angular/router';
   `]
 })
 export class AdminHome {
-  productService = inject(AdminProductService);
-  productList: AdminProduct[] = this.productService.getAllProducts();
+  productList: AdminProduct[] = [];
+  
+  constructor(private productService: AdminProductService) {}
+
+  ngOnInit() {
+    this.loadProducts();
+  }
+
+  loadProducts() {
+    this.productService.getAllProducts().subscribe({
+      next: (products) => {
+        this.productList = products; // now you have the actual array
+      },
+      error: (err) => {
+        console.error('Failed to load products', err);
+      }
+    });
+  }
 
 }

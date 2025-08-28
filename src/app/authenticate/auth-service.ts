@@ -22,9 +22,16 @@ export class AuthService {
       `${this.apiUrl}/login`,
       { usernameOrEmail: username, password }
     ).pipe(
-      tap(res => localStorage.setItem('token', res.token))
+      tap(res => {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('role', this.setRole(res.roles));
+  })
     );
   }
+
+setRole(roles: string[]): string {
+  return roles.includes('ROLE_ADMIN') ? 'ROLE_ADMIN' : 'ROLE_USER';
+}
 
   // register method
   register(username: string, email: string, password: string) {
