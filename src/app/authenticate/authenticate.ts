@@ -66,20 +66,21 @@ export class Authenticate {
   get password() { return this.registerForm.get('password')!; }
   get email() { return this.registerForm.get('email')!; }
 
-  login() {
-  const username = this.registerForm.get('username')!.value || '';
-  const password = this.registerForm.get('password')!.value || '';
-    this.auth.login(username, password).subscribe({
-      next: res => {
-        if (res.roles.includes('ROLE_ADMIN')) {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
-      },
-      error: err => alert('Login failed: Invalid credentials')
-    });
-  }
+login() {
+  const username = this.loginForm.get('username')!.value || '';
+  const password = this.loginForm.get('password')!.value || '';
+  this.auth.login(username, password).subscribe({
+    next: res => {
+      if (res.roles.includes('ROLE_ADMIN')) {
+        this.router.navigate(['/admin/dashboard']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
+    },
+    error: err => alert('Login failed: Invalid credentials')
+  });
+}
+
 
   register() {
   const username = this.registerForm.get('username')!.value || '';
